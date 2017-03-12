@@ -4,60 +4,42 @@
 #include "stdafx.h"
 #include "read_num.h"
 #include "MyRandom.h"
+#include "node.h"
+#include "LinkedList.h"
 
-#include <iostream>     // std::cout
 using namespace std;
 
+using intNode = node<int>;
+using intRnd = MyRandom<int>;
+using intList = LinkeList<int>;
+bool intNode::log = false;
 
-class node
-{
-public:
-	node(int x)
-		: data(x), next(nullptr)
-	{
-		if (log)
-		{
-			std::cout << data << ", ";
-		}
-	}
-
-	~node()
-	{
-		if (log)
-		{
-			std::cout << "~" << data << ", ";
-		}
-	}
-
-	static bool log;
-	int data;
-	node* next;
-};
-
-bool node::log = false;
 
 class ConsoleMenu
 {
 public:
 	ConsoleMenu()
-		: _myRnd(-100, 100),
-		  _header(nullptr),
-		  _footer(nullptr)
+		: _intRnd(-100, 100),
+		  _boolRnd(0, 1)
 	{
 	}
 
 	~ConsoleMenu()
 	{
-		clearList();
 	}
 
 	void displayMenu()
 	{
-		cout << "0. Display Menu" << endl << endl;
-		cout << "1. Build Linked List" << endl;
-		cout << "2. Print Binary Tree" << endl;
+		cout << "0. Display Menu" << endl;
+		cout << endl;
+		cout << "1. Build Linked List (int)" << endl;
+		cout << "2. Print Linked List (int)" << endl;
+		cout << "3. Build Linked List (bool)" << endl;
+		cout << "4. Print Linked List (bool)" << endl;
+		cout << "5. Order boolean Linked List" << endl;
 		cout << "98. Print debug logger" << endl;
-		cout << endl << "99. EXit" << endl;
+		cout << endl;
+		cout << "99. EXit" << endl;
 	}
 
 	void start()
@@ -73,59 +55,58 @@ public:
 			{
 			case 0: displayMenu(); break;
 
-			case 1: buildList(); break;
+			case 1: _intList.buildRandomList(_intRnd); break;
 
-			case 2: displayMenu(); break;
+			case 2: _intList.printList(); break;
 
-			case 98: node::log = !node::log; break;
+			case 3: _boolList.buildRandomList(_boolRnd); break;
 
-			case 99: loop = false; break;
+			case 4: _boolList.printList(); break;
+
+			case 5: orderBoolList(); break;
+
+			case 98:
+				intNode::log = !intNode::log;
+				break;
+
+			case 99:
+				loop = false;
+				break;
 			}
 		}
 	}
-	void clearList()
+
+	void orderBoolList()
 	{
-		node* current = _header;
+		intNode* curLeft = _boolList._header;
+		intNode* curRight = _boolList._footer;
 
-		while (current != nullptr)
+		while (curLeft != nullptr &&
+		        curRight != nullptr &&
+		        curLeft != curRight)
 		{
-			node* next = current->next;
-			delete current;
-			current = next;
-		}
-
-		_footer = _header = nullptr;
-	}
-
-	void addNodeToList(node* pNode)
-	{
-		if (_header == nullptr)
-			_header = _footer = pNode;
-		else
-		{
-			_footer->next = pNode;
-			_footer = pNode;
-		}
-	}
-
-	void buildList()
-	{
-		clearList();
-		auto i = read_num("List size", 1, 100);
-		node* pCurNode = nullptr;
-
-		for (int j = 0; j < i; ++j)
-		{
-			node* pNode = new node(_myRnd.GetNext());
-			addNodeToList(pNode);
+			if (curLeft->data == 0)
+			{
+				curLeft = curLeft->next;
+			}
+			else if (curRight->data == 1)
+			{
+				curRight = curLeft->prev;
+			}
+			else
+			{
+				int data = curLeft->data;
+				curLeft->data = curRight->data;
+				curRight->data = data;
+			}
 		}
 	}
-
 
 private:
-	MyRandom<int>_myRnd;
-	node*	_header;
-	node*	_footer;
+	intRnd _intRnd;
+	intRnd _boolRnd;
+	intList	_intList;
+	intList	_boolList;
 };
 
 int main()
