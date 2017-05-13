@@ -36,7 +36,7 @@ public:
 		cout << "2. Print Linked List (int)" << endl;
 		cout << "3. Build Linked List (bool)" << endl;
 		cout << "4. Print Linked List (bool)" << endl;
-		cout << "5. Order boolean Linked List" << endl;
+		cout << "5. Order boolean Array" << endl;
 		cout << "98. Print debug logger" << endl;
 		cout << endl;
 		cout << "99. EXit" << endl;
@@ -63,7 +63,7 @@ public:
 
 			case 4: _boolList.printList(); break;
 
-			case 5: orderBoolList(); break;
+			case 5: orderBoolArray(); break;
 
 			case 98:
 				intNode::log = !intNode::log;
@@ -76,30 +76,63 @@ public:
 		}
 	}
 
-	void orderBoolList()
+	void orderBoolArray()
 	{
-		intNode* curLeft = _boolList._header;
-		intNode* curRight = _boolList._footer;
+		int size = read_num("Size of Array", 0, 100);
+		std::vector<int> ballsArray;
+		intRnd ballsRnd(0, 2);
 
-		while (curLeft != nullptr &&
-		        curRight != nullptr &&
-		        curLeft != curRight)
+		for (int i = 0; i < size; ++i)
 		{
-			if (curLeft->data == 0)
+			ballsArray.push_back(ballsRnd.GetNext());
+		}
+
+		cout << "Before: ";
+
+		for (auto& item : ballsArray)
+		{
+			cout << item << " ";
+		}
+
+		auto iterLeft = std::begin(ballsArray);
+		auto iterRight = std::end(ballsArray)-1;
+		int iterationCounter = 0;
+
+		// while left is before the right
+		while (iterLeft < iterRight)
+		{
+			// while left is not at the end and its point to min value
+			while (iterLeft != std::end(ballsArray) &&
+			        *iterLeft == ballsRnd.GetMin())
 			{
-				curLeft = curLeft->next;
+				++iterationCounter;
+				++iterLeft;
 			}
-			else if (curRight->data == 1)
+
+			// while right is not at the beginning and its point to max value
+			while (iterRight != std::begin(ballsArray) &&
+			        *iterRight == ballsRnd.GetMax())
 			{
-				curRight = curLeft->prev;
+				++iterationCounter;
+				--iterRight;
 			}
-			else
+
+			if (iterLeft < iterRight)
 			{
-				int data = curLeft->data;
-				curLeft->data = curRight->data;
-				curRight->data = data;
+				int data = *iterLeft;
+				*iterLeft = *iterRight;
+				*iterRight = data;
 			}
 		}
+
+		cout << endl << "After:  ";
+
+		for (auto& item : ballsArray)
+		{
+			cout << item << " ";
+		}
+
+		cout << endl << "Iteration Counter: " << iterationCounter << endl;
 	}
 
 private:
